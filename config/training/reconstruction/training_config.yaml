@@ -1,0 +1,58 @@
+# 学習設定ファイル
+
+# データ設定
+data:
+  # データセット設定
+  dataset:
+    train_path: "./data/raw/16frames/gt_gray"  # 学習データのパス
+    test_path: "./data/raw/16frames/test_mat"  # テストデータのパス
+    val_path: "./data/raw/16frames/test_mat"    # 検証データのパス
+    
+  # データローダー設定
+  dataloader:
+    batch_size: 4                     # バッチサイズ
+    num_workers: 4                    # データロードのワーカー数
+    shuffle: true                     # データをシャッフルするか
+    
+  # 前処理設定
+  preprocessing:
+    patch_size: [16, 8, 8]            # パッチサイズ
+    normalize: true                   # 正規化するか
+    augmentation: true                # データ拡張を行うか
+
+# 最適化設定
+optimization:
+  # オプティマイザー設定
+  optimizer:
+    type: "adam"                      # オプティマイザーの種類
+    learning_rate: 0.0001          # 再構成モデルの学習率
+    weight_decay: 0.0001              # 重み減衰
+  
+  # マスク最適化設定  
+  mask_lr: 0.0001                     # マスク最適化の学習率
+  
+  # スケジューラー設定
+  scheduler:
+    type: "step"                      # スケジューラーの種類
+    decay_rate: 0.97                  # 減衰率
+    decay_steps: 20                   # 減衰ステップ数
+  
+  # 損失関数設定
+  loss:
+    reconstruction_loss: "mse"        # 再構成損失
+
+# 学習ループ設定
+training:
+  num_epochs: 3000                 # 学習エポック数
+  save_interval: 1                   # モデル保存間隔
+  eval_interval: 1                    # 評価間隔
+  stage_num: 9                        # ステージ数
+
+# ロギング設定
+logging:
+  tensorboard: false                  # TensorBoardを使用するか
+  checkpoint_dir: "./checkpoints/reconstruction/general_8x8"  # チェックポイント保存ディレクトリ
+  mask_save_dir: "./mask_pre-train"        # マスク保存ディレクトリ
+  recon_save_dir: "./recon"                # 再構成結果保存ディレクトリ
+  result_save_dir: "./results/logs/reconstruction/general_8x8'"    # 評価結果保存ディレクトリ
+  save_images: true                   # 画像を保存するか

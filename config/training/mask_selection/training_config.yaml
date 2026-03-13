@@ -1,0 +1,33 @@
+# Mask Selection Training Configuration
+
+# Data configuration
+data:
+  dataset:
+    train_path: "./data/raw/full_size/gt_mat"
+  dataloader:
+    batch_size: 1
+    shuffle: true
+    num_workers: 4
+
+# Training configuration
+training:
+  num_epochs: 1500
+  save_interval: 100
+  eval_interval: 50
+
+# Optimization configuration
+optimization:
+  optimizer:
+    learning_rate: 0.001
+  replay:
+    replay_batch_size: 4
+    min_experiences: 1000
+
+# Logging configuration
+logging:
+  save_dir: "./results/logs/mask_selection"
+  
+# Model paths
+model_paths:
+  mask_dir: "./data/mask/candidates"
+  psnr_results: "./data/psnr_record/16masks.npz"

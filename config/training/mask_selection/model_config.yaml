@@ -1,0 +1,15 @@
+# Mask Selection Model Configuration
+
+# Decision network configuration
+decision_net:
+  num_masks: 16
+  epsilon_start: 1.0
+  epsilon_end: 0.001
+  epsilon_decay: 0.99
+  buffer_size: 30000
+
+# Reconstruction models configuration
+reconstruction:
+  mask_candidates:
+    num_masks: 16
+    model_extension: ".mat"
