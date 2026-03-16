@@ -68,7 +68,7 @@ class DecisionNet(nn.Module):
             [B, num_classes] - logits or probability distribution over next mask selection
         """
         # Concatenate compressed measurement and mask
-        x = torch.cat([compressed_measurement], dim=1)  # [B, 17, 8, 8]
+        x = torch.cat([compressed_measurement], dim=1) 
         # REMOVED: x = self.input_norm(x) - testing without input normalization
         x = self.features(x)
         x = x.view(x.size(0), -1)
@@ -87,63 +87,3 @@ class DecisionNet(nn.Module):
         """Get probability distribution (for inference/evaluation)"""
         return self.forward(compressed_measurement, return_logits=False)
 
-class DecisionNetWithEpsilonGreedy(DecisionNet):
-    def __init__(self, num_classes=16, epsilon_start=1.0, epsilon_end=0.001, epsilon_decay=0.995):
-        super().__init__(num_classes)
-        self.num_classes = num_classes
-        self.epsilon = epsilon_start
-        self.epsilon_end = epsilon_end
-        self.epsilon_decay = epsilon_decay
-
-    def forward_with_exploration(self, compressed_measurement, training=True):
-        """
-        Forward pass with epsilon-soft exploration strategy.
-
-        Instead of choosing between 100% model or 100% random (one-hot),
-        we blend model predictions with uniform distribution based on epsilon.
-        This encourages diversity while still using learned preferences.
-        """
-        device = compressed_measurement.device
-        batch_size = compressed_measurement.size(0)
-
-        # Get model predictions (probabilities)
-        model_probs = super().forward(compressed_measurement, return_logits=False)
-
-        if not training:
-            # During evaluation, use pure model predictions
-            return model_probs
-
-        # Epsilon-soft strategy: blend model predictions with uniform distribution
-        # epsilon = 0: pure model predictions (exploitation)
-        # epsilon = 1: uniform distribution (maximum exploration)
-        uniform_probs = torch.ones_like(model_probs) / self.num_classes
-
-        # Blend: (1 - epsilon) * model + epsilon * uniform
-        blended_probs = (1 - self.epsilon) * model_probs + self.epsilon * uniform_probs
-
-        return blended_probs
-
-    def update_epsilon(self):
-        self.epsilon = max(self.epsilon_end, self.epsilon * self.epsilon_decay)
-        return self.epsilon
-
-class ExperienceBuffer:
-    def __init__(self, buffer_size=10000):
-        self.buffer = deque(maxlen=buffer_size)
-
-    def append(self, experience):
-        """Add experience"""
-        self.buffer.append(experience)
-
-    def sample(self, batch_size):
-        """Sample batch_size experiences randomly from buffer"""
-        return random.sample(self.buffer, min(batch_size, len(self.buffer)))
-
-    def __len__(self):
-        return len(self.buffer)
-
-class DecisionNetWithExpReplay(DecisionNetWithEpsilonGreedy):
-    def __init__(self, num_classes=16, epsilon_start=1.0, epsilon_end=0.01,
-                 epsilon_decay=0.995, buffer_size=30000):
-        super().__init__(num_classes, epsilon_start, epsilon_end, epsilon_decay)
-        self.experience_buffer = ExperienceBuffer(buffer_size)
