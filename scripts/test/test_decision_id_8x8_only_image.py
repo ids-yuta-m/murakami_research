@@ -35,7 +35,7 @@ from pathlib import Path
 # Configuration  (edit here)
 # ---------------------------------------------------------------------------
 
-CHECKPOINT_PATH = './checkpoints/mask_selection/select_models_id_only_image/select_model_ep172_acc0.1210.pth'
+CHECKPOINT_PATH = './checkpoints/mask_selection/select_models_id_only_image/trained_model.pth'
 MASK_DIR        = './data/masks/candidates/16masks'
 VIDEO_DIR       = './data/raw/256x256/test_mat'
 
