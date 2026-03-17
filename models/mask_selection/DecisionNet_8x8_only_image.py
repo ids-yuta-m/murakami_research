@@ -15,8 +15,6 @@ class DecisionNet(nn.Module):
     def __init__(self, num_classes=16):
         super(DecisionNet, self).__init__()
         # Input: compressed measurement (1 channel) = 1 channels total
-        # REMOVED InstanceNorm to test if it was removing critical input information
-        # self.input_norm = nn.InstanceNorm2d(17)
 
         # Note: Using LayerNorm instead of BatchNorm to support batch_size=1 during training
         self.features = nn.Sequential(
@@ -69,7 +67,6 @@ class DecisionNet(nn.Module):
         """
         # Concatenate compressed measurement and mask
         x = torch.cat([compressed_measurement], dim=1) 
-        # REMOVED: x = self.input_norm(x) - testing without input normalization
         x = self.features(x)
         x = x.view(x.size(0), -1)
         logits = self.classifier(x)
